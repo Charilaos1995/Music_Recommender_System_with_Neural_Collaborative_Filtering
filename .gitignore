@@ -1,1 +1,4 @@
 MusicRecommenderSystem/.idea/
+
+# Ignore all files in the data folder
+MusicRecommenderSystem/data/*
