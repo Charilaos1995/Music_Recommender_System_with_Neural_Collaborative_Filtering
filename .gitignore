@@ -1,6 +1,4 @@
-
+.idea/
 
 # Ignore files in the data folder
-MusicRecommenderSystem/data/cleaned_merged_data.csv
-MusicRecommenderSystem/data/User Listening History.csv
-MusicRecommenderSystem/data/Music Info.csv
+MusicRecommenderSystem/data
