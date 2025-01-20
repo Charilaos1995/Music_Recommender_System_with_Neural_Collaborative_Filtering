@@ -5,37 +5,45 @@ import os
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 print("Working directory set to:", os.getcwd())
 
-# Step 1: Load the dataset
-file_path = 'data/Last.fm_data.csv'
-df = pd.read_csv(file_path)
+# File paths
+music_info_path = 'data/Music Info.csv'
+listening_history_path = 'data/User Listening History.csv'
+output_path = 'data/cleaned_merged_data.csv'
 
-# Step 2: Inspect the dataset
-print("First few rows:")
-print(df.head())
+# Step 1: Load Music Info dataset
+music_df = pd.read_csv(music_info_path)
+print("\nMusic Info Dataset Loaded. First few rows:")
+print(music_df.head())
 
-print("\nDataset Info:")
-print(df.info())
+# Step 2: Clean Music Info dataset
+music_df['genre'] = music_df['genre'].fillna('unspecified')
 
-# Step 3: Check for missing values
-print("\nMissing Values:")
-print(df.isnull().sum())
+for col in ['name', 'artist', 'genre', 'tags']:
+    if col in music_df.columns:
+        music_df[col] = music_df[col].str.lower().str.strip()
 
-# Step 4: Preprocess the dataset
-# Example: Converting 'Date' and 'Time' into a single datetime column
-df['Datetime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'], format='%d %b %Y %H:%M')
+# Step 3: Process User Listening History in Chunks
+chunk_size = 100000  # Number of rows per chunk
+processed_chunks = []
 
-# Dropping unnecessary columns
-df = df.drop(columns=['Date', 'Time'])
+print("\nProcessing User Listening History in chunks...")
+for chunk in pd.read_csv(listening_history_path, chunksize=chunk_size):
+    print(f"Processing chunk with {len(chunk)} rows...")
+    # Merge the current chunk with the Music Info dataset
+    merged_chunk = chunk.merge(music_df, on='track_id', how='inner')
+    processed_chunks.append(merged_chunk)
 
-# Normalize text data
-df['Artist'] = df['Artist'].str.strip().str.lower()
-df['Track'] = df['Track'].str.strip().str.lower()
+# Step 4: Combine all processed chunks
+merged_df = pd.concat(processed_chunks, ignore_index=True)
 
-# Step 5: Save the cleaned dataset
-cleaned_file_path = 'data/cleaned_Last.fm_data.csv'
-df.to_csv(cleaned_file_path, index=False)
-print(f"Cleaned data saved to {cleaned_file_path}")
+# Step 5: Save the final merged dataset
+merged_df.to_csv(output_path, index=False)
+print(f"\nCleaned and merged data saved to {output_path}")
 
-# Display final structure
-print("\nCleaned Dataset Info:")
-print(df.info())
+# Step 6: Summary of the merged dataset
+print("\nMerged Dataset Info:")
+print(merged_df.info())
+
+if 'genre' in merged_df.columns:
+    print("\nGenre Distribution in Merged Dataset:")
+    print(merged_df['genre'].value_counts())
