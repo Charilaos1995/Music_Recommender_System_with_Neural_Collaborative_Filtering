@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 
 # Change working directory to the project root
@@ -6,44 +7,39 @@ os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 print("Working directory set to:", os.getcwd())
 
 # File paths
-music_info_path = 'data/Music Info.csv'
-listening_history_path = 'data/User Listening History.csv'
-output_path = 'data/cleaned_merged_data.csv'
+#users_path = 'data/triplets_file.csv'
+#songs_path = 'data/song_data.csv'
+#output_path = 'data/cleaned_merged_data.csv'
 
-# Step 1: Load Music Info dataset
-music_df = pd.read_csv(music_info_path)
-print("\nMusic Info Dataset Loaded. First few rows:")
-print(music_df.head())
+# Step1 : Loading the Dataset
+users_df = pd.read_csv('data/triplets_file.csv')
+#print(users_df.head())
 
-# Step 2: Clean Music Info dataset
-music_df['genre'] = music_df['genre'].fillna('unspecified')
+songs_df = pd.read_csv('data/song_data.csv')
+#print(songs_df.head())
 
-for col in ['name', 'artist', 'genre', 'tags']:
-    if col in music_df.columns:
-        music_df[col] = music_df[col].str.lower().str.strip()
+music_df = pd.merge(users_df, songs_df.drop_duplicates(['song_id']), on='song_id', how='left')
+pd.set_option('display.max_columns', None)
+#print(music_df.head())
 
-# Step 3: Process User Listening History in Chunks
-chunk_size = 100000  # Number of rows per chunk
-processed_chunks = []
+#print(len(users_df), len(songs_df))
+#print(len(music_df))
 
-print("\nProcessing User Listening History in chunks...")
-for chunk in pd.read_csv(listening_history_path, chunksize=chunk_size):
-    print(f"Processing chunk with {len(chunk)} rows...")
-    # Merge the current chunk with the Music Info dataset
-    merged_chunk = chunk.merge(music_df, on='track_id', how='inner')
-    processed_chunks.append(merged_chunk)
+# Step 2: Data preprocessing
+# Combine title and artist name into a new feature
+music_df['song'] = music_df['title'] + ' - ' + music_df['artist_name']
+# Drop the 'title' and 'artist_name' columns
+music_df = music_df.drop(['title', 'artist_name'], axis=1)
+# Print the updated DataFrame
+#print(music_df.head())
 
-# Step 4: Combine all processed chunks
-merged_df = pd.concat(processed_chunks, ignore_index=True)
+# Taking the top 10k samples for quick results
+music_df = music_df.head(10000)
 
-# Step 5: Save the final merged dataset
-merged_df.to_csv(output_path, index=False)
-print(f"\nCleaned and merged data saved to {output_path}")
+# Cumulative sum of listen count for each song
+music_grouped = music_df.groupby(['song']).agg({'listen_count':'count'}).reset_index()
+print(music_grouped.head())
 
-# Step 6: Summary of the merged dataset
-print("\nMerged Dataset Info:")
-print(merged_df.info())
-
-if 'genre' in merged_df.columns:
-    print("\nGenre Distribution in Merged Dataset:")
-    print(merged_df['genre'].value_counts())
+grouped_sum = music_grouped['listen_count'].sum()
+music_grouped['percentage'] = (music_grouped['listen_count'] / grouped_sum) * 100
+print(music_grouped.sort_values(['listen_count', 'song'], ascending=[0,1]))
