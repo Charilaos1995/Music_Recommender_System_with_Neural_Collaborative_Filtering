@@ -1,7 +1,7 @@
 .idea/
 
-# Ignore files in the data folder
-data/
+# Ignore files in the Neural Collaborative Filtering data folder
+NCF_data/
 
 # Ignore files in the ContentBased data folder
 ContentBased_data/
