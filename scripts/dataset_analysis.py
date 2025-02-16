@@ -2,8 +2,8 @@ import pandas as pd
 
 # File paths
 datasets = {
-    "cleaned_merged_music_data": "../data/cleaned_merged_music_data.csv",
-    "sampled_music_data": "../data/sampled_music_data.csv"
+    "cleaned_merged_music_data": "../NCF_data/cleaned_merged_music_data.csv",
+    "sampled_music_data": "../NCF_data/sampled_music_data.csv"
 }
 
 # Function to analyze each dataset

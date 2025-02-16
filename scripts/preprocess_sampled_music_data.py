@@ -1,10 +1,10 @@
 import pandas as pd
 
 # File paths
-users_path = '../data/triplets_file.csv'
-songs_path = '../data/song_data.csv'
-output_path = '../data/cleaned_merged_music_data.csv'
-sampled_output_path = '../data/sampled_music_data.csv'
+users_path = '../NCF_data/triplets_file.csv'
+songs_path = '../NCF_data/song_data.csv'
+output_path = '../NCF_data/cleaned_merged_music_data.csv'
+sampled_output_path = '../NCF_data/sampled_music_data.csv'
 
 # Load the Datasets
 users_df = pd.read_csv(users_path)
@@ -30,7 +30,7 @@ music_df.to_csv(output_path, index=False)
 music_sample_df.to_csv(sampled_output_path, index=False)
 
 print(f"Full dataset saved to: {output_path}")
-print("Sampled dataset saved to: data/sampled_music_data.csv")
+print("Sampled dataset saved to: NCF_data/sampled_music_data.csv")
 
 # Display a summary of the sampled dataset
 print('\nSampled DataFrame:')

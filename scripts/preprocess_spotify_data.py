@@ -1,7 +1,7 @@
 import pandas as pd
 
 # File path
-spotify_data_path = '../data/spotify_data.csv'
+spotify_data_path = '../NCF_data/spotify_data.csv'
 
 # Load the dataset
 spotify_df = pd.read_csv(spotify_data_path)

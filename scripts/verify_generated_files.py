@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # Define data directory
-data_dir = "../data"
+data_dir = "../NCF_data"
 
 # Function to preview file contents
 def preview_file(file_path, num_lines=5):

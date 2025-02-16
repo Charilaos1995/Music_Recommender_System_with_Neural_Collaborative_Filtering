@@ -115,7 +115,7 @@ class Recommender:
 
 if __name__ == "__main__":
     # Load the dataset
-    music_data_path = '../data/cleaned_merged_music_data.csv'
+    music_data_path = '../NCF_data/cleaned_merged_music_data.csv'
     music_df = pd.read_csv(music_data_path)
 
     # Initialize the recommender

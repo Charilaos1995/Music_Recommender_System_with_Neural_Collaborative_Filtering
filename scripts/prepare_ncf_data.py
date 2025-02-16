@@ -4,7 +4,7 @@ import os
 import random
 
 # Data directory to save the generated files
-data_dir = "../data"
+data_dir = "../NCF_data"
 
 # Load the dataset
 file_path = os.path.join(data_dir, "cleaned_merged_music_data.csv")
