@@ -17,7 +17,7 @@ class Dataset:
         :param data_dir:
         """
         # Set default data directory if not provided
-        self.data_dir = data_dir or os.path.join(os.path.dirname(__file__), "../../NCF_data")
+        self.data_dir = data_dir or os.path.abspath(os.path.join(os.path.dirname(__file__), "../../NCF_data"))
 
         # File paths
         self.train_file = os.path.join(self.data_dir, "train.rating")

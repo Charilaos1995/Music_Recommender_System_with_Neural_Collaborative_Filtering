@@ -1,10 +1,9 @@
 import sys
 import os
+from src.data.dataset import Dataset
 
 # Add the project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
-
-from src.data.dataset import Dataset
 
 def test_dataset_loading():
     """Test the Dataset class by loading data and checking its attributes."""
