@@ -28,7 +28,7 @@ os.makedirs(data_dir, exist_ok=True)
 
 # Save the train.rating file
 train_file = os.path.join(data_dir, "train.rating")
-df[['user_id', 'song_id', 'rating', 'timestamp']].to_csv(train_file, sep="\t", index=False, header=False)
+df[['user_id', 'song_id', 'rating']].to_csv(train_file, sep="\t", index=False, header=False)
 print(f"Saved: {train_file}")
 
 # Generate test.rating (one song per user)
@@ -42,19 +42,14 @@ all_songs_ids = set(df['song_id'].unique())
 negative_samples = []
 
 for user, song in test_ratings.itertuples(index=False):
-    user_songs = set(df[df['user_id'] == user]['song_id'])
+    user_songs = set(df[df['user_id'] == user]['song_id']) # Songs the user has listened to
     negatives = list(all_songs_ids - user_songs)  # Songs the user hasn't listened to
 
-    if len(negatives) < 99:
-        print(f"User {user} has only {len(negatives)} possible negative samples. Filling with all available.")
-        sampled_negatives = negatives  # Use all available negatives
-    else:
-        sampled_negatives = random.sample(negatives, 99)  # Sample 99 negatives
+    sampled_negatives = random.sample(negatives, min(99, len(negatives))) # Sample up to 99 negatives
 
     negative_samples.append([user, *sampled_negatives])
 
 print(f"Generated {len(negative_samples)} negative samples (expected: {len(test_ratings)})")
-
 
 # Save test.negative file
 test_negative_file = os.path.join(data_dir, "test.negative")
