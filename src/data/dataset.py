@@ -36,7 +36,7 @@ class Dataset:
 
         # Set dataset dimensions
         self.num_users, self.num_items = self.trainMatrix.shape
-        logging.info(f"Dataset loaded: {self.num_users} users, {self.num_items} songs.")
+        logging.info(f"Dataset loaded: {self.num_users} users, {self.num_items} songs, {len(self.trainMatrix.nonzero()[0])} interactions")
 
     def _check_if_files_exist(self):
         """Check if the required dataset files exist."""
@@ -82,10 +82,14 @@ class Dataset:
                 num_items = max(num_items, i)
                 interactions.append((u, i))
 
-        # Construct sparse matrix
-        mat = sp.dok_matrix((num_users + 1, num_items + 1), dtype=np.float32)
-        for user, song in interactions:
-            mat[user, song] = 1.0 # Implicit feedback (binary: 1 for interaction)
+        # Convert list of (user, song) pairs into separate arrays
+        row, col = zip(*interactions)  # Extract user (row) and song (col) indices
+
+        # Create a NumPy array with ones (for implicit feedback)
+        data = np.ones(len(row), dtype=np.float32)
+
+        # Construct the sparse matrix in CSR format
+        mat = sp.csr_matrix((data, (row, col)), shape=(num_users + 1, num_items + 1), dtype=np.float32)
 
         logging.info(f"Loaded {len(interactions)} interactions into sparse matrix.")
         return mat
