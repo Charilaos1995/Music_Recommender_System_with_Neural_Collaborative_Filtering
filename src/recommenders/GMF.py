@@ -5,17 +5,20 @@ Adapted for the Music Recommender System.
 Based on the original NCF implementation by He Xiangnan et al. in WWW 2017.
 """
 
+import argparse
+import os
+import ast
+from time import time
+
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Embedding, Input, Flatten, Multiply
 from tensorflow.keras.optimizers import Adam, Adagrad, RMSprop, SGD
 from tensorflow.keras.regularizers import l2
+
 from src.data.dataset import Dataset
 from src.recommenders.evaluate import evaluate_model
-import argparse
-import os
-from time import time
 
 #################### Argument Parsing ####################
 def parse_args():
@@ -41,7 +44,7 @@ def parse_args():
     return parser.parse_args()
 
 #################### Model Definition ####################
-def get_model(num_users, num_songs, latent_dim, regs=[0, 0]):
+def get_model(num_users, num_songs, latent_dim, regs=[0, 0], lr=0.001):
     """
     Builds the GMF model for user-song interactions.
 
@@ -49,6 +52,7 @@ def get_model(num_users, num_songs, latent_dim, regs=[0, 0]):
     :param num_songs: Number of unique songs in the dataset
     :param latent_dim: Embedding size for users and songs
     :param regs: Regularization parameters for embedding
+    :param lr: Learning rate for the optimizer
     :return: Compiled GMF model
     """
     # Input layers
@@ -58,11 +62,11 @@ def get_model(num_users, num_songs, latent_dim, regs=[0, 0]):
     # Embedding layers
     user_embedding = Embedding(input_dim=num_users, output_dim=latent_dim,
                                embeddings_initializer=tf.keras.initializers.RandomNormal(stddev=0.01),
-                               embeddings_regularizer=l2(regs[0]), input_length=1, name='user_embedding')
+                               embeddings_regularizer=l2(regs[0]), name='user_embedding')
 
     song_embedding = Embedding(input_dim=num_songs, output_dim=latent_dim,
                                embeddings_initializer=tf.keras.initializers.RandomNormal(stddev=0.01),
-                               embeddings_regularizer=l2(regs[1]), input_length=1, name='song_embedding')
+                               embeddings_regularizer=l2(regs[1]),name='song_embedding')
 
     # Flatten embeddings
     user_latent = Flatten()(user_embedding(user_input))
@@ -76,7 +80,7 @@ def get_model(num_users, num_songs, latent_dim, regs=[0, 0]):
 
     # Build the model
     model = Model(inputs=[user_input, song_input], outputs=prediction)
-    model.compile(optimizer=Adam(learning_rate=0.001), loss='binary_crossentropy')
+    model.compile(optimizer=Adam(learning_rate=lr), loss='binary_crossentropy')
 
     return model
 
@@ -114,6 +118,9 @@ def train_gmf():
     args = parse_args()
     data_dir = args.data_dir
 
+    # Parse regs safely
+    regs = ast.literal_eval(args.regs)
+
     # Load the dataset
     dataset = Dataset(data_dir)
     train, testRatings, testNegatives = dataset.trainMatrix, dataset.testRatings, dataset.testNegatives
@@ -122,7 +129,7 @@ def train_gmf():
     print(f"Data Loaded: {num_users} users, {num_songs} songs.")
 
     # Get GMF model
-    model = get_model(num_users, num_songs, args.num_factors, eval(args.regs))
+    model = get_model(num_users, num_songs, args.num_factors, regs)
 
     # Training loop
     for epoch in range(args.epochs):
@@ -142,10 +149,11 @@ def train_gmf():
             hits, ndcgs = evaluate_model(model, testRatings, testNegatives, K=10, num_threads=1)
             hr, ndcg = np.array(hits).mean(), np.array(ndcgs).mean()
             loss = hist.history['loss'][0]
-            print(f"Epoch {epoch}: HR={hr:.4f}, NDCG={ndcg:.4f}, Loss{loss:.4f} [Time: {t2 - t1:.1f}s]")
+            print(f"Epoch {epoch}: HR={hr:.4f}, NDCG={ndcg:.4f}, Loss={loss:.4f} [Time: {t2 - t1:.1f}s]")
 
     if args.out > 0:
-        model_path = os.path.join(data_dir, f"GMF_{args.num_factors}.h5")
+        os.makedirs("models", exist_ok=True)
+        model_path = os.path.join("models", f"GMF_{args.num_factors}.h5")
         model.save_weights(model_path)
         print(f"Model saved to {model_path}")
 

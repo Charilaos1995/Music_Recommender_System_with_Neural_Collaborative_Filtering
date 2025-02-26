@@ -5,18 +5,20 @@ Adapted for the Music Recommender System.
 Based on the original NCF implementation by He Xiangnan et al. in WWW 2017.
 """
 
-import tensorflow as tf
-import numpy as np
-from keras.models import Model
-from keras.layers import Dense, Embedding, Input, Flatten, Concatenate
-from keras.regularizers import l2
-from keras.optimizers import Adam, Adagrad, SGD, RMSprop
-from keras.initializers import RandomNormal
-from src.data.dataset import Dataset
-from src.recommenders.evaluate import evaluate_model
 import argparse
 import os
-from time import time
+import ast
+
+import numpy as np
+from keras.initializers import RandomNormal
+from keras.layers import Dense, Embedding, Input, Flatten, Concatenate
+from keras.models import Model
+from keras.optimizers import Adam, Adagrad, SGD, RMSprop
+from keras.regularizers import l2
+
+from src.data.dataset import Dataset
+from src.recommenders.evaluate import evaluate_model
+
 
 #################### Argument Parsing ####################
 def parse_args():
@@ -109,13 +111,16 @@ def get_train_instances(train, num_negatives):
 
 def train_mlp():
     args = parse_args()
+
+    # Safely parse layers
+    layers = ast.literal_eval(args.layers)
+    reg_layers = ast.literal_eval(args.reg_layers)
+
     dataset = Dataset(args.data_dir)
     train, testRatings, testNegatives = dataset.trainMatrix, dataset.testRatings, dataset.testNegatives
     num_users, num_songs = train.shape
 
     # Build the MLP model
-    layers = eval(args.layers)
-    reg_layers = eval(args.reg_layers)
     model = get_model(num_users, num_songs, layers, reg_layers)
 
     optimizer_dict = {
@@ -147,7 +152,8 @@ def train_mlp():
 
     # Save model
     if args.out > 0:
-        model_path = os.path.join(args.data_dir, f"MLP_{args.layers}.h5")
+        os.makedirs("models", exist_ok=True)
+        model_path = os.path.join("models", f"MLP_{args.layers}.h5")
         model.save_weights(model_path)
         print(f"Model saved to {model_path}")
 

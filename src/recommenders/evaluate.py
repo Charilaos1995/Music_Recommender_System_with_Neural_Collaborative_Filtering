@@ -13,7 +13,11 @@ import math
 import heapq # Used for retrieving top-K songs
 import multiprocessing
 import numpy as np
+import logging
 from time import time
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Global variables shared across multiple processes for multi-threaded evaluation
 _model = None # The trained model used for predictions
@@ -38,7 +42,10 @@ def evaluate_model(model, testRatings, testNegatives, K, num_threads):
     _testNegatives = testNegatives
     _K = K
 
+    logging.info(f"Evaluating model with Top-{K} recommendations...")
+
     hits, ndcgs = [], []
+    start_time = time()
 
     # Use multiprocessing for faster evaluation if num_threads > 1
     if num_threads > 1:
@@ -50,13 +57,15 @@ def evaluate_model(model, testRatings, testNegatives, K, num_threads):
         # Unpack results from multiprocessing
         hits = [r[0] for r in results]
         ndcgs = [r[1] for r in results]
-        return hits, ndcgs
+    else:
+        # Single-threaded evaluation
+        for idx in range(len(_testRatings)):
+            hr, ndcg = eval_one_rating(idx)
+            hits.append(hr)
+            ndcgs.append(ndcg)
 
-    # Single-threaded evaluation
-    for idx in range(len(_testRatings)):
-        hr, ndcg = eval_one_rating(idx)
-        hits.append(hr)
-        ndcgs.append(ndcg)
+    end_time = time()
+    logging.info(f"Evaluation completed in {end_time - start_time:.2f} seconds.")
 
     return hits, ndcgs
 
@@ -69,7 +78,7 @@ def eval_one_rating(idx):
     2. Retrieve 99 negative samples (songs the user has not interacted with).
     3. Compute predicted scores for all 100 songs (99 negatives + 1 ground truth).
     4. Sort predictions to get the Top-K recommended songs.
-    5. Compute Hit Ration (HR) and NDCG for this user.
+    5. Compute Hit Ratio (HR) and NDCG for this user.
 
     :param idx: Index of the user in the test set
     :return: (HR, NDCG) score for this user
@@ -123,7 +132,7 @@ def get_ndcg(ranklist, gt_song):
     """
     Compute the Normalized Discounted Cumulative Gain (NDCG@K).
 
-    NDCG rewards correct recommendations renked higher in the Top-K list.
+    NDCG rewards correct recommendations ranked higher in the Top-K list.
 
     Formula:
     NDCG@K = log(2) / log(position + 2)
@@ -132,9 +141,9 @@ def get_ndcg(ranklist, gt_song):
     :param gt_song: The actual song the user interacted with (ground truth)
     :return: NDCG score (higher is better)
     """
-    for i in range(len(ranklist)):
-        if ranklist[i] == gt_song:
-            return math.log(2) / math.log(i + 2) # Logarithmic discounting
+    for i, song in enumerate(ranklist):
+        if song == gt_song:
+            return math.log(2) / math.log(i + 2)  # Logarithmic discounting
     return 0
 
 
