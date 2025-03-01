@@ -93,3 +93,30 @@ class Dataset:
 
         logging.info(f"Loaded {len(interactions)} interactions into sparse matrix.")
         return mat
+
+    def get_train_instances(self, num_negatives):
+        """
+        Generates training data with negative sampling.
+
+        :param num_negatives: Number of negative samples per positive instance
+        :return: user_input, song_input, labels (1 for positive, 0 for negative)
+        """
+        user_input, song_input, labels = [], [], []
+        num_users, num_songs = self.trainMatrix.shape
+
+        for (u, s) in zip(*self.trainMatrix.nonzero()):
+            # Positive instance
+            user_input.append(u)
+            song_input.append(s)
+            labels.append(1)
+
+            # Negative sampling
+            for _ in range(num_negatives):
+                neg_s = np.random.randint(num_songs) # Random song
+                while self.trainMatrix[u, neg_s] != 0: # Ensure it's not an actual interaction
+                    neg_s = np.random.randint(num_songs)
+                user_input.append(u)
+                song_input.append(neg_s)
+                labels.append(0)
+
+        return user_input, song_input, labels

@@ -81,34 +81,6 @@ def get_model(num_users, num_songs, layers=[64, 32, 16, 8], reg_layers=[0, 0, 0,
     return model
 
 #################### Training & Evaluation ####################
-def get_train_instances(train, num_negatives):
-    """
-    Generates training data with negative sampling.
-
-    :param train: Sparse matrix of user-song interactions (train.rating)
-    :param num_negatives: Number of negative samples per positive instance
-    :return: user_input, song_input, labels (1 for positive, 0 for negative)
-    """
-    user_input, song_input, labels = [], [], []
-    num_users, num_songs = train.shape
-
-    for (u, s) in train.keys():
-        # Positive instance
-        user_input.append(u)
-        song_input.append(s)
-        labels.append(1)
-
-        # Negative sampling: Select 'num_negatives random songs the user hasn't listened to
-        for _ in range(num_negatives):
-            neg_s = np.random.randint(num_songs) # Random song
-            while (u, neg_s) in train:
-                neg_s = np.random.randint(num_songs) # Ensure it's not an actual interaction
-            user_input.append(u)
-            song_input.append(neg_s)
-            labels.append(0)
-
-    return user_input, song_input, labels
-
 def train_mlp():
     args = parse_args()
 
@@ -134,7 +106,7 @@ def train_mlp():
 
     # Training loop
     for epoch in range(args.epochs):
-        user_input, song_input, labels = get_train_instances(train, args.num_neg)
+        user_input, song_input, labels = dataset.get_train_instances(args.num_neg)
         model.fit(
             [np.array(user_input), np.array(song_input)],
             np.array(labels),
