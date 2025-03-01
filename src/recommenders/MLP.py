@@ -10,11 +10,12 @@ import os
 import ast
 
 import numpy as np
-from keras.initializers import RandomNormal
-from keras.layers import Dense, Embedding, Input, Flatten, Concatenate
-from keras.models import Model
-from keras.optimizers import Adam, Adagrad, SGD, RMSprop
-from keras.regularizers import l2
+import tensorflow as tf
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense, Embedding, Input, Flatten, Concatenate
+from tensorflow.keras.optimizers import Adagrad, Adam, SGD, RMSprop
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.initializers import RandomNormal
 
 from src.data.dataset import Dataset
 from src.recommenders.evaluate import evaluate_model
