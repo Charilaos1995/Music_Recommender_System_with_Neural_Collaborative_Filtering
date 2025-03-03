@@ -60,7 +60,7 @@ class Dataset:
         with open(filename, "r") as f:
             for line in f:
                 arr = line.strip().split("\t")
-                user = int(arr[0])
+                int(arr[0])
                 negatives = list(map(int, arr[1:])) # Convert negative songs  to integers
                 negative_list.append(negatives)
         return negative_list

@@ -1,7 +1,10 @@
 .idea/
 
-# Ignore files in the Neural Collaborative Filtering data folder
-NCF_data/
+# Ignore everything in NCF_data except specific files
+NCF_data/*
+!NCF_data/train.rating
+!NCF_data/test.rating
+!NCF_data/test.negative
 
 # Ignore files in the ContentBased data folder
 ContentBased_data/
@@ -11,3 +14,7 @@ ContentBased_data/
 
 # Ignore csv files gloabally
 *.csv
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
