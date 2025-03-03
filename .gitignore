@@ -12,6 +12,10 @@ ContentBased_data/
 # Ignore notebooks
 notebooks/
 
+# Ignore specific files that are not part of the NCF implementation
+src/Recommenders.py
+scripts/preprocess_spotify_data.py
+
 # Ignore all MP3 files globally
 *.mp3
 
