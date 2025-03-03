@@ -9,6 +9,9 @@ NCF_data/*
 # Ignore files in the ContentBased data folder
 ContentBased_data/
 
+# Ignore notebooks
+notebooks/
+
 # Ignore all MP3 files globally
 *.mp3
 
