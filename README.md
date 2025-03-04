@@ -1,4 +1,4 @@
-# Music Recommender System using Neural Collaborative Filtering
+# Music Recommender System with Neural Collaborative Filtering
 
 ## Overview
 
@@ -12,7 +12,7 @@ The framework includes:
 - **Multi-Layer Perceptron (MLP)**
 - **Neural Matrix Factorization (NeuMF)** (a hybrid approach combining GMF and MLP)
 
-The system is trained on a dataset of user-song interactions and evaluated using **Hit Ration (HR@K) and Normalized Discounted Cumulative Gain (NDCG@K)**.
+The system is trained on a dataset of user-song interactions and evaluated using **Hit Ratio (HR@K) and Normalized Discounted Cumulative Gain (NDCG@K)**.
 
 ---
 
@@ -26,9 +26,9 @@ These two datasets were **merged and processed** into:
 - **`cleaned_merged_music_data.csv`**: A cleaned version combining `triplets_file.csv` and `song_data.csv`, mapping **user interactions to song metadata**.
 
 From this merged dataset, the following files were generated:
--**`train.rating`**: Training data for the recommender system.
--**`test.rating`**: Test set containing ground-truth songs for each user.
--**`test.negative`**: Negative samples used for evaluation.
+- **`train.rating`**: Training data for the recommender system.
+- **`test.rating`**: Test set containing ground-truth songs for each user.
+- **`test.negative`**: Negative samples used for evaluation.
 
 Only `train.rating`, `test.rating`, and `test.negative` are required for training and evaluation. 
 They are include in the repository under `NCF_data/`, while the raw datasets (`triplets_file.csv`, `song_data.csv`, and `cleaned_merged_music_data.csv`) were used for preprocessing.
