@@ -1,3 +1,20 @@
+"""
+preprocess_sampled_music_data.py
+
+Preprocesses the Million Song Dataset (MSD) subset:
+- Merges user listening data (`triplets_file.csv`) with song metadata (`song_data.csv`)
+- Drops duplicates and missing values
+- Saves a cleaned merged dataset and a 10,000-row sampled version for faster testing
+
+Inputs:
+    ../NCF_data/triplets_file.csv    : User-song interaction data
+    ../NCF_data/song_data.csv        : Song metadata
+
+Outputs:
+    ../NCF_data/cleaned_merged_music_data.csv : Full merged dataset
+    ../NCF_data/sampled_music_data.csv        : Random sample of 10,000 rows
+"""
+
 import pandas as pd
 
 # File paths
@@ -16,7 +33,7 @@ print(users_df.isnull().sum())
 print("Missing values in songs dataset:")
 print(songs_df.isnull().sum())
 
-# Merge the datasets on song_id
+# Merge the datasets on 'song_id'
 music_df = pd.merge(users_df, songs_df, on='song_id', how='left')
 
 # Drop duplicate rows if any
@@ -28,7 +45,6 @@ music_sample_df = music_df.sample(n=10000, random_state=42)
 # Save both the full dataset and the sampled dataset
 music_df.to_csv(output_path, index=False)
 music_sample_df.to_csv(sampled_output_path, index=False)
-
 print(f"Full dataset saved to: {output_path}")
 print("Sampled dataset saved to: NCF_data/sampled_music_data.csv")
 
@@ -36,7 +52,7 @@ print("Sampled dataset saved to: NCF_data/sampled_music_data.csv")
 print('\nSampled DataFrame:')
 print(music_sample_df.head())
 
-# Display grouped statistics for debugging
+# Summary Statistics: Top Songs by Total Listen Count
 music_grouped = music_sample_df.groupby(['title', 'artist_name']).agg({'listen_count':'sum'}).reset_index()
 print("\nTop Songs by Listen Count:")
 print(music_grouped.sort_values(['listen_count', 'title'], ascending=[0,1]).head())
