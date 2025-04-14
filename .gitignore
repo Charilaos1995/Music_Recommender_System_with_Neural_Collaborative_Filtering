@@ -11,16 +11,16 @@ __pycache__/
 # Ignore all CSVs by default...
 *.csv
 
-# ...but allow only the important ones inside NCF_data
+# Allow the folder
+!NCF_data/
+NCF_data/*
+
+# Then unignore specific files after that
 !NCF_data/train.rating
 !NCF_data/test.rating
 !NCF_data/test.negative
 !NCF_data/user_idx2original.pkl
 !NCF_data/song_idx2original.pkl
-
-# Ignore everything in NCF_data except those we explicitly allow above
-NCF_data/*
-!NCF_data/
 
 # Ignore Content-Based Filtering data folder
 ContentBased_data/
