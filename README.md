@@ -8,8 +8,12 @@ Adapted from the original paper by He et al. (WWW 20217): Xiangnan He, Lizi Liao
 In Proceedings of WWW '17, Perth, Australia, April 03-07, 2017.
 - **Item-Based Collaborative Filtering (ItemCF):** A traditional recommender based on the similarity between items.
 
-Both models use the same preprocessed dataset derived from The Million Song Dataset (MSD). The evaluation is performed using standard metrics such as **Hit Ratio (HR@K)**, **NDCG@K**, and **Recall@K**.
 ---
+
+Both models use the same preprocessed dataset derived from The Million Song Dataset (MSD). The evaluation is performed using standard metrics such as Hit Ratio (HR@K), NDCG@K, and Recall@K.
+
+---
+
 
 ## Dataset Information
 
@@ -118,27 +122,30 @@ Execute the `prepare_ncf_data.py` script to generate:
 To launch the interactive recommendation CLI, run:
 ```shell
 python -m scripts.recommend_songs
+```
 
-___
-
+---
 
 ## Model Evaluation
 
 Once trained, the models are evaluated using standard recommendation metrics:
 - **Hit Ratio (HR@K)**: Measures how often the ground-truth song appears in the Top-K recommendations.
 - **Normalized Discounted Cumulative Gain (NDCG@K)**: Rewards correct recommendations when they appear at higher ranks.
-- **Recall@K**: Since each test user has exactly one positive instance, recall@K is equivalent to HR@K.
+- **Recall@K**: Since each test user has exactly one positive instance, Recall@K is equivalent to HR@K.
 
 To evaluate the MLP recommender, run:
 ```shell
 python -m scripts.evaluate_mlp_model
+```
 
 To evaluate the Item-Based Collaborative Filtering recommender, run:
+```shell
 python -m scripts.evaluate_itemcf
+```
 
 Both scripts print the average HR@K, NDCG@K, and Recall@K along with the evaluation runtime.
 
-```
+___
 
 ## Dependencies and Setup
 
@@ -167,6 +174,12 @@ It is recommended to run the project inside a virtual environment. To create and
 python -m venv MusicRecSys
 source MusicRecSys/Scripts/activate
 pip install -r requirements.txt
+```
+
+### On Windows (Command Prompt)
+```shell
+python -m venv MusicRecSys
+MusicRecSys\Scripts\activate
 ```
 
 #### On macOS/Linux
